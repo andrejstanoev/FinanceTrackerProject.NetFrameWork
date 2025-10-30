@@ -1,0 +1,117 @@
+﻿@model FinanceTrackerProject.Models.UserViewModel
+
+<style>
+    .welcome-panel {
+        border: 1px solid #aaa;
+        border-radius: 5px;
+        padding: 16px;
+        margin-bottom: 24px;
+        background: #fff;
+    }
+
+    .info-section {
+        margin-bottom: 12px;
+    }
+
+    .info-section span {
+        font-weight: bold;
+    }
+
+    .summary-card {
+        border: 1px solid #bbb;
+        border-radius: 5px;
+        padding: 16px;
+        background: #fafafa;
+        margin-bottom: 12px;
+    }
+
+    .summary-title {
+        text-align: center;
+        font-weight: bold;
+        margin-bottom: 12px;
+        
+    }
+
+    .dashboard-table {
+        width: 100%;
+        margin: 0;
+    }
+
+    .dashboard-table td, .dashboard-table th {
+        padding: 8px 12px;
+        text-align: center;
+        border: 1px solid #ddd;
+    }
+
+    .dashboard-table th {
+        background: #f5faff;
+        font-weight: bold;
+    }
+
+    .latest-budgets {
+        background-color: white;
+        padding: 15px 10px;
+        border-radius: 10px;
+        border: 1px solid black; 
+        transition: background 0.18s, box-shadow 0.18s;
+    }
+
+    .latest-budgets:hover {
+        background: #f3fbff;
+        box-shadow: 2px 4px 18px rgba(13,202,240,0.13);
+    }
+</style>
+
+@Html.Partial("_Navbar")
+
+<div class="container mt-5">
+
+    <div class="row">
+        
+        <div class="col-md-4 welcome-panel">
+            <h4 class="h2">Personal Information</h4>
+            <div style="font-size:20px" class="info-section">
+                Username: <span>@Model.UserName</span>
+            </div>
+
+            <div style="font-size:20px" class="info-section">
+                E-mail: <span>@Model.Email</span>
+            </div>
+        </div>
+
+       
+        <div class="col-md-8">
+            <table class="dashboard-table mb-3">
+                <tr>
+                    <th style="font-size:22px">Num. Budgets:</th>
+                    <th style="font-size:22px">Num. Expenses:</th>
+                    <th style="font-size:22px">Total Budget:</th>
+                </tr>
+                <tr>
+                    <td style="font-size:24px">@Model.NumBudgets</td>
+                    <td style="font-size:24px">@Model.NumExpenses</td>
+                    <td style="font-size:24px">$@String.Format("{0:F0}", Model.TotalBudget)</td>
+                </tr>
+            </table>
+
+            <div class="summary-card">
+                <div class="summary-title" style="font-size:24px">Latest Budgets:</div>
+                <div style="display:flex; justify-content:space-evenly; gap:10px;">
+                    @if (Model.LatestBudgets != null && Model.LatestBudgets.Count > 0)
+                    {
+                        foreach (var budget in Model.LatestBudgets)
+                        {
+                            <a href="@Url.Action("Details", "Budgets", new {id = budget.Id})" style="text-decoration: none; color: inherit;">
+                                <div style="font-size:20px" class="latest-budgets">@budget.Name - <span style="color: #0dcaf0">$@budget.Ammount</span></div>
+                            </a>
+                        }
+                    }
+                    else
+                    {
+                        <div>You have no budgets</div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

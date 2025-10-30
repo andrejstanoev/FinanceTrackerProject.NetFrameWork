@@ -1,0 +1,214 @@
+﻿@model FinanceTrackerProject.Models.Budget
+
+@{
+    ViewBag.Title = "Budget Details";
+    var spent = Model.Expenses?.Sum(e => (float?)e.Ammount) ?? 0;
+    var remaining = Model.Ammount - spent;
+    var percentSpent = Model.Ammount == 0 ? 0 : Math.Min((spent / Model.Ammount) * 100, 100);
+}
+
+<style>
+    .budget-details-card {
+        border-radius: 20px;
+        box-shadow: 1px 1px 10px rgba(0,0,0,0.10), -1px -1px 10px rgba(0,0,0,0.07);
+        background: #fff;
+        padding: 30px 28px 22px 28px;
+        max-width: 770px;
+        margin: 22px auto 0 auto;
+    }
+
+    .budget-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 10px;
+    }
+
+    .budget-title {
+        font-size: 1.5em;
+        font-weight: bold;
+    }
+
+    .budget-balance {
+        color: #0dcaf0;
+        font-size: 1.3em;
+        font-weight: bold;
+    }
+
+    .budget-info-row {
+        margin-bottom: 12px;
+        color: #6c757d;
+    }
+
+    .expense-bar-bg {
+        height: 16px;
+        background: #e1edf7;
+        border-radius: 8px;
+        overflow: hidden;
+        margin-bottom: 18px;
+    }
+
+    .expense-bar-fill {
+        background: linear-gradient(90deg, #0dcaf0 70%, #1bb8e8 100%);
+        height: 100%;
+        border-radius: 8px 0 0 8px;
+        transition: width 0.45s;
+    }
+
+    .expenses-list {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .expenses-list li {
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        font-size: 1.05em;
+        align-items:center;
+    }
+
+    .expenses-list li:last-child {
+        border-bottom: none;
+    }
+
+    .no-expenses {
+        margin: 14px 4px 0 4px;
+        color: #888;
+        text-align: left;
+    }
+
+    .details-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 22px;
+    }
+</style>
+
+<div class="container">
+    <div class="budget-details-card">
+        <div class="budget-header">
+            <div>
+                <div class="budget-title">@Model.Name</div>
+                <div class="budget-info-row">
+                    Created: @Model.Date.ToString("dd MMM yyyy")<br />
+                    Owner: @((Model.User != null) ? Model.User.UserName : "-")
+                </div>
+            </div>
+            <div id="totalAmmount" class="budget-balance">
+                $@Model.Ammount.ToString("N0")
+            </div>
+        </div>
+
+        <div class="mb-2" style="display:flex;justify-content:space-between;font-weight:500;">
+            <span id="spent-amount" style="color:#0dcaf0;">$@spent Spent</span>
+            <span id="remaining-amount" style="color:#888;">$@remaining Remaining</span>
+        </div>
+        <div class="expense-bar-bg">
+            <div id="progress-bar" class="expense-bar-fill" style="width: @percentSpent%;"></div>
+        </div>
+
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:15px">
+            <div class="mb-2" style="font-weight:600;color:#1769aa;">Expenses</div>
+            <div>
+                @Html.ActionLink("Add Expense", "CreateForBudget", "Expenses", new { id = Model.Id }, new {@class= "btn btn-primary" })
+            </div>
+        </div>
+        @if (Model.Expenses != null && Model.Expenses.Count > 0)
+        {
+            <ul class="expenses-list">
+                @foreach (var expense in Model.Expenses.OrderByDescending(e => e.Date))
+                {
+                    <li data-expense-id="@expense.Id" data-expense-amount="@expense.Ammount">
+                        <span style="font-weight:500">@expense.Name</span>
+                        <span>-$@expense.Ammount.ToString("N2")</span>
+                        <span>
+                            @Html.ActionLink("Edit", "EditWithinBudget", "Expenses", new { budgetId = Model.Id, expenseId = expense.Id }, new { @class = "btn btn-outline-dark" })
+                            <button data-expense-id="@expense.Id" class="btn btn-outline-danger js-delete-expense">Delete</button>
+                        </span>
+                    </li>
+                }
+            </ul>
+        }
+        else
+        {
+            <div class="no-expenses">No expenses in this budget</div>
+        }
+
+    <div class="details-actions">
+        @Html.ActionLink("Edit", "Edit", new { id = Model.Id }, new { @class = "btn btn-outline-primary" })
+        @*@Html.ActionLink("Delete", "Delete", new { id = Model.Id }, new { @class = "btn btn-outline-danger" })*@
+        <button data-budget-id="@Model.Id" class="btn btn-outline-danger js-delete">Delete</button>
+        @Html.ActionLink("Back to Budgets", "Index", null, new { @class = "btn btn-secondary" })
+    </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            $(".js-delete").on("click", function () {
+                var button = $(this)
+                bootbox.confirm("Do you really want to delete this budget?", function (result) {
+                    if (result) {
+                        $.ajax({
+                            url: `/Budgets/Delete/${button.attr("data-budget-id")}`,
+                            method: "GET",
+                            success: function () {
+                                window.location.href = '/Budgets/Index';
+                            }
+                        })
+                    }
+                })
+            })
+
+            $(".js-delete-expense").on("click", function () {
+                var button = $(this)
+                var li = button.closest("li");
+                var amount = parseFloat(li.data("expense-amount").toString().replace(',', '.')) || 0;
+                bootbox.confirm("Do you really want to delete this expense?", function (result) {
+                    if (result) {
+                        $.ajax({
+                            url: `/Expenses/Delete/${button.attr("data-expense-id")}`,
+                            method: "GET",
+                            success: function () {
+                                button.closest('li').remove();
+
+                                if ($(".expenses-list li").length === 0) {
+                                    $(".no-expenses").show();
+                                }
+                                                                  
+                                var spentText = $("#spent-amount").text().replace(/[^0-9.]/g, '');
+                                var spent = parseFloat(spentText) || 0;
+                                                               
+                                var newSpent = spent - amount;
+                                if (newSpent < 0) newSpent = 0;
+                               
+                                var totalText = $("#totalAmmount").text().replace(/[^0-9]/g, '');
+                                var total = parseFloat(totalText) || 0;
+                              
+                                var newRemaining = total - newSpent;
+                                if (newRemaining < 0) newRemaining = 0;
+                              
+                                var percentSpent = total === 0 ? 0 : Math.min((newSpent / total) * 100, 100);
+
+                                $("#spent-amount").text("$" + newSpent + " Spent");
+                                $("#remaining-amount").text("$" + newRemaining + " Remaining");
+                                $("#progress-bar").css("width", percentSpent + "%");
+                                console.log(spentText)
+                                console.log(spent)
+                                console.log(newSpent)
+                                console.log(totalText)
+                                console.log(total)
+                                console.log(newRemaining)
+                                
+                            }
+                        })
+                    }
+                })
+            })
+        })
+    </script>        
+}

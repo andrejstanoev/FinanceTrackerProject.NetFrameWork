@@ -1,0 +1,80 @@
+﻿@model FinanceTrackerProject.Models.Budget
+
+@{
+    ViewBag.Title = "Edit";
+}
+
+<style>
+    .card {
+        background: #fff;
+        border-radius: 18px;
+        box-shadow: 0 2px 16px rgba(0,0,0,0.07), 0 1.5px 3px rgba(13,202,240,0.04);
+        max-width: 480px;
+        margin: 38px auto 0 auto;
+        padding: 32px 26px 22px 26px;
+    }
+</style>
+
+<div class="container">
+    <div class="card">
+
+
+        <h2>Edit</h2>
+
+
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>Budget</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.Id)
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        @*<div class="form-group">
+            @Html.LabelFor(model => model.Ammount, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Ammount, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Ammount, "", new { @class = "text-danger" })
+            </div>
+        </div>*@
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Ammount, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <div class="input-group">
+                    <span class="input-group-addon" style="margin-top:6px;">$</span>
+                    @Html.EditorFor(model => model.Ammount, new { htmlAttributes = new { @class = "form-control", min = "0", step = "any", type = "number" } })
+                </div>
+                @Html.ValidationMessageFor(model => model.Ammount, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:20px">
+            <div class="form-group">
+                <div style="margin-top:15px" class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="Save" class="btn btn-primary" />
+                </div>
+            </div>
+            <div style="margin-top:15px">
+                @Html.ActionLink("Cancel", "Details", "Budgets", new { id = Model.Id }, new { @class = "btn btn-outline-danger" })
+            </div>
+        </div>
+    </div>
+        }
+    </div>
+</div>
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

@@ -1,0 +1,85 @@
+﻿@model IEnumerable<FinanceTrackerProject.Models.Expense>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+@Html.Partial("_Navbar")
+
+<div style="display:flex; align-items:center; justify-content:space-between; margin-top:30px; margin-bottom:50px">
+
+    <h2>All Expenses</h2>
+
+    <p>
+        @Html.ActionLink("Create New Expense", "Create", "Expenses", null, new { @class = "btn btn-primary" })
+    </p>
+</div>
+<table id="expenseTable" class="table">
+    <thead>
+        <tr>
+            <th>
+                Budget name
+            </th>
+
+            <th>
+                Expense name
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Ammount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Date)
+            </th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Budget.Name)
+            </td>
+
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                $@Html.DisplayFor(modelItem => item.Ammount)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Date)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit","Expenses", new { id = item.Id }, new {@class= "btn btn-outline-dark" }) |
+                @Html.ActionLink("Details", "Details","Expenses", new { id = item.Id }, new { @class = "btn btn-outline-dark" }) |
+                <button data-expense-id="@item.Id" class="btn btn-outline-danger js-delete">Delete</button>
+            </td>
+        </tr>
+    }
+    </tbody>
+
+</table>
+
+@section scripts{
+   <script>
+       $(document).ready(function () {
+           var table = $("#expenseTable").DataTable();
+           $("#expenseTable .js-delete").on("click", function () {
+               var button = $(this);
+               bootbox.confirm("Дали сакаш да го избришеш овој трошок", function (result) {
+                   if (result) {
+                       $.ajax({
+                           url: "/Expenses/Delete/" + button.attr("data-expense-id"),
+                           method: "GET",
+                           success: function () {
+                               table.row(button.parents("tr")).remove().draw();
+                           }
+                       });
+                   }
+               })
+           })
+       })
+    </script>
+}

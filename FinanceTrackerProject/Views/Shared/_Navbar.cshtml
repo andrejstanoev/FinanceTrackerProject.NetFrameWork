@@ -1,0 +1,54 @@
+﻿@* Views/Shared/_Navbar.cshtml *@
+@{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+}
+<style>
+
+        .meni {
+            border-bottom: 1px solid black;
+        }
+
+        .item {
+            padding: 4px 6px 4px 6px;
+            font-size: 21px;
+        }
+
+        .meni-link {
+            text-decoration: none;
+            color: black;
+            padding: 2px;
+            transition: all 0.1s;
+            font-size:28px
+        }
+
+        .meni-link:hover {
+            background-color: #0dcaf0;
+            color: snow;
+            border-radius: 4px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .meni-link.active {
+            background-color: #0dcaf0;
+            color: white;
+            border-radius: 4px;
+            font-weight: 700;
+        }
+</style>
+
+<nav class="navbar navbar-expand-lg navbar-dark meni">
+    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item item">
+            @Html.ActionLink("Home", "Index", "Welcome", new { area = "" }, new { @class = "meni-link "+(currentController=="Welcome" ? "active":"") })
+        </li>
+        <li class="nav-item item">
+            @Html.ActionLink("Budgets", "Index", "Budgets", new { area = "" }, new { @class = "meni-link " + (currentController == "Budgets" ? "active" : "") })
+        </li>
+        <li class="nav-item item">
+            @Html.ActionLink("Expenses", "Index", "Expenses", new { area = "" }, new { @class = "meni-link " + (currentController == "Expenses" ? "active" : "") })
+        </li>
+    </ul>
+</nav>
+

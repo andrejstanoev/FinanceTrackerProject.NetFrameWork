@@ -1,0 +1,89 @@
+﻿@model FinanceTrackerProject.Models.Expense
+
+@{
+    ViewBag.Title = "Expense Details";
+}
+
+<style>
+    .expense-details-card {
+        background: #fff;
+        border-radius: 18px;
+        box-shadow: 0 2px 16px rgba(0,0,0,0.07), 0 1.5px 3px rgba(13,202,240,0.04);
+        max-width: 480px;
+        margin: 38px auto 0 auto;
+        padding: 32px 26px 22px 26px;
+    }
+    .expense-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #0dcaf0;
+        margin-bottom: 12px;
+    }
+    .expense-info-list dt {
+        float: left;
+        clear: left;
+        width: 50%;
+        font-weight: 500;
+        color: #555;
+    }
+    .expense-info-list dd {
+        margin-left: 52%;
+        margin-bottom: 12px;
+        color: #233;
+        font-size: 1.06em;
+    }
+    .expense-actions {
+        margin-top: 28px;
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+    }
+
+    media (max-width: 600px) {
+        .expense-details-card { padding: 20px 6vw; }
+        .expense-title { font-size: 1.13rem; }
+    }
+</style>
+
+<div class="container">
+    <div class="expense-details-card">
+        <div class="expense-title">
+            Expense Details
+        </div>
+
+        <dl class="expense-info-list">
+            <dt>Budget name</dt>
+            <dd>
+                <span class="badge bg-info text-dark" style="font-size:1em;">
+                    @Html.DisplayFor(model => model.Budget.Name)
+                </span>
+            </dd>
+
+            <dt>@Html.DisplayNameFor(model => model.User.Email)</dt>
+            <dd>
+                <i class="bi bi-person-circle" style="color:#aaa;margin-right:5px;"></i>
+                @Html.DisplayFor(model => model.User.Email)
+            </dd>
+
+            <dt>Expense name</dt>
+            <dd>
+                @Html.DisplayFor(model => model.Name)
+            </dd>
+
+            <dt>@Html.DisplayNameFor(model => model.Ammount)</dt>
+            <dd>
+                <span class="fw-semibold text-success">$@string.Format("{0:N2}", Model.Ammount)</span>
+            </dd>
+
+            <dt>@Html.DisplayNameFor(model => model.Date)</dt>
+            <dd>
+                <span class="text-muted">@Model.Date.ToString("dd MMM yyyy")</span>
+            </dd>
+        </dl>
+
+        <div class="expense-actions">
+            @Html.ActionLink("Edit", "Edit", new { id = Model.Id }, new { @class = "btn btn-outline-primary" })
+            @Html.ActionLink("Back to List", "Index", null, new { @class = "btn btn-light" })
+        </div>
+    </div>
+</div>
